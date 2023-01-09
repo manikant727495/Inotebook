@@ -2,19 +2,39 @@ import React, { useEffect, useState, useRef } from 'react'
 import NoteContext from './Context/Notes/NoteContext'
 import { useContext } from 'react'
 import Noteitem from './Noteitem';
+import { useNavigate } from 'react-router-dom';
 function Notes() {
-  const ref = useRef(null);
+  const ref1 = useRef(null);
+  const confirmDeleteRef = useRef(null);
+  const closeConfirmDelete = useRef(null);
   const refclose = useRef(null);
   const context = useContext(NoteContext);
-  const { getAllNotes, notes , updateNote} = context;
+  const { getAllNotes, notes , updateNote, deleteNote} = context;
   const [note, setNote] = useState({ etitle: "", edescription: "", etag: "" });
+  const [id,setId] = useState('');
+  const navigate = useNavigate();
   useEffect(() => {
-    getAllNotes();
+    if(localStorage.getItem('auth-token')){
+      getAllNotes();
+    } else {
+      navigate('/login');
+    }
     // eslint-disable-next-line
   }, [])
+  function confirmDelete(id){
+    console.log('in confirm delete');
+    setId(id);
+    confirmDeleteRef.current.click();
+  }
+
+  function handleDelete(){
+    deleteNote(id);
+    setId('');
+    closeConfirmDelete.current.click()
+  }
 
   const editNote = (note) => {
-    ref.current.click();
+    ref1.current.click();
     setNote({ etitle: note.title, edescription: note.description, etag: note.tag, id: note._id})
   }
 
@@ -30,7 +50,7 @@ function Notes() {
 
   return (
     <>
-      <button ref={ref} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      <button ref={ref1} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
         Launch demo modal
       </button>
       <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -63,10 +83,32 @@ function Notes() {
           </div>
         </div>
       </div>
+
+      <button ref={confirmDeleteRef} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModalDelete">
+        Launch demo modal
+      </button>
+
+      <div className="modal " id="exampleModalDelete" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">Are you sure delete this note?</h5>
+            </div>
+            <div className="modal-body">
+              This note will be permanentely removed and you wont be able to see them again.
+            </div>
+            <div className="modal-footer">
+              <button ref = {closeConfirmDelete} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" className="btn btn-primary" onClick={handleDelete}>Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>  
+
       <div className="row my-3">
         <h2>Your Notes</h2>
         {notes.map((note) => {
-          return <Noteitem key= {note._id} note={note} editNote={editNote} />
+          return <Noteitem key= {note._id} note={note} editNote={editNote} confirmDelete={confirmDelete}/>
         })}
       </div>
     </>

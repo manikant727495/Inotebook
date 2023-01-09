@@ -27,7 +27,7 @@ router.post(
             // check wether email already exist or not exis
             const checkUser = await User.findOne({email: req.body.email});
             if(checkUser){
-                return (res.status(400).json({error: 'sorry, email already exis'}));
+                return (res.status(400).json({error: 'This email already exist'}));
             }
             const salt = await bcrypt.genSalt(10);
             const securePassword = await bcrypt.hash(req.body.password,salt);

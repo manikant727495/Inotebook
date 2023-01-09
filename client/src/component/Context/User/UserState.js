@@ -1,7 +1,9 @@
+import { useState } from "react";
 import UserContext from "./UserContext";
 
 const UserState = (props) =>{
     const url = 'http://localhost:5000/api/auth';
+    const [user,setUser] = useState({name:" "});
     // Validated user
     const validateUser = async (user) =>{
         const data = {
@@ -35,10 +37,23 @@ const UserState = (props) =>{
         const res = await response.json();
         return res;
     }
+
+    const getUser = async () =>{
+        const response = await fetch(`${url}/getuser`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "auth-token": localStorage.getItem('auth-token')
+            }
+        })
+        const res = await response.json();
+        res.name = res.name.toUpperCase();
+        setUser(res);
+    }
     
 
     return(
-        <UserContext.Provider value = {{validateUser,createUser}}>
+        <UserContext.Provider value = {{validateUser,createUser,getUser,user}}>
             {props.children}
         </UserContext.Provider>
     )
