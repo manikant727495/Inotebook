@@ -6,7 +6,7 @@ const { body, validationResult } = require('express-validator');
 const { findById, findByIdAndUpdate } = require('../models/User');
 
 
-//Route 1: get all notes using ge
+//Route 1: get all notes using get
 router.get('/getallnotes',
             fetchuser,
             async(req, res)=>{
